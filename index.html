@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>M7MD</title>
+	<link rel="icon" href="./favicon.ico">
+	<link rel="stylesheet" href="./src/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="./src/css2.css" rel="stylesheet">
+<style type="text/css">@font-face { font-family: Roboto; src: url("chrome-extension://mcgbeeipkmelnpldkobichboakdfaeon/css/Roboto-Regular.ttf"); }</style></head>
+
+<body onresize="resize()" onload="main()" data-new-gr-c-s-check-loaded="14.1087.0" data-gr-ext-installed="">
+<canvas id="canvas-background"></canvas>
+<script src="./src/sparkle.js"></script>
+<script>
+  function videoPlay() {
+      var video = document.getElementById("video");
+			video.volume = 0.05;
+			video.play();
+  }
+
+	function audioPlay() {
+			var audio = document.getElementById("audio");
+			audio.volume = 0.15;
+			audio.play();
+	}
+</script>
+
+<video loop="" preload="auto" class="vidoverlay" id="video">
+	<source src="./ship.mp4" type="video/mp4">
+</video>
+
+<audio loop="" preload="auto" id="audio">
+	<source src="./ .mp3" type="audio/mpeg">
+</audio>
+
+<input type="checkbox" autocomplete="off" id="overlay-toggle">
+<div class="overlay fullscreen">
+	<label for="overlay-toggle" onclick="videoPlay(); audioPlay(); ">
+		<span class="overlayno-hover hover" style="font-family: monospace; font-size: 0.6em;">click to enter</span>
+		<span class="overlayhover hover" style="font-family: monospace; font-size: 0.6em;">click to enter</span>
+	</label>
+</div>
+
+<div id="center" align="center">
+	<span>
+		<p class="hover graffiti" style="font-size: 100px">M7MD
+		</p><p class="hover"></p>
+
+		<p class="hover">
+			<a href="https://discord.com/users/791145016080859166" target="_blank" class="hover">discord</a> |
+			<a href="https://www.instagram.com/z3tr.rz/" target="_blank" class="hover">instagram</a>
+
+		</p><p class="hover"></p>
+		<p></p>
+	</span>
+</div>
+
+<script>
+		var returnedSuggestion = ''
+		let editor, doc, cursor, line, pos
+		document.addEventListener("keydown", (event) => {
+		setTimeout(()=>{
+			editor = event.target.closest('.CodeMirror');
+			doc = editor.CodeMirror.getDoc()
+			cursor = doc.getCursor()
+			line = doc.getLine(cursor.line)
+			pos = {line: cursor.line, ch: line.length}
+			if (event.key == "Enter"){
+			var query = doc.getRange({ line: Math.max(0,cursor.line-10), ch: 0 }, { line: cursor.line, ch: 0 })
+			window.postMessage({source: 'getSuggestion', payload: { data: query } } )
+			//displayGrey(query)
+			}
+			else if (event.key == "ArrowRight"){
+			acceptTab(returnedSuggestion)
+			}
+		}, 0)
+		})
+
+		function acceptTab(text){
+		if (suggestionDisplayed){
+			doc.replaceRange(text, pos)
+			suggestionDisplayed = false
+		}
+		}
+		function displayGrey(text){
+		var element = document.createElement('span')
+		element.innerText = text
+		element.style = 'color:grey'
+		var lineIndex = pos.line;
+		editor.getElementsByClassName('CodeMirror-line')[lineIndex].appendChild(element)
+		suggestionDisplayed = true
+		}
+		window.addEventListener('message', (event)=>{
+		if (event.source !== window ) return
+		if (event.data.source == 'return'){
+			returnedSuggestion = event.data.payload.data
+			displayGrey(event.data.payload.data)
+		}
+		})
+		</script>
+	</body>
+	
+	</html>
